@@ -8,3 +8,4 @@ fix url
 final test
 Testing CI pipeline only
 trigger test
+another test
