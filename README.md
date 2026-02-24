@@ -10,3 +10,4 @@ Testing CI pipeline only
 trigger test
 another test
 test push Tue, Feb 24, 2026 12:11:20 PM
+fix k8s auth
