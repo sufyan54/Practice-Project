@@ -1,5 +1,6 @@
 FROM nginx:alpine
-COPY Practice.html /usr/share/nginx/html/index.html
+COPY index.html /usr/share/nginx/html/index.html
+COPY style.css /usr/share/nginx/html/style.css
 # OR copy everything
 # COPY . /usr/share/nginx/html
 EXPOSE 80
