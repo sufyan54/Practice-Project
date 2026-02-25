@@ -4,10 +4,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>DevOps CI/CD Demo</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    This is a practice side
-    This is a second commit on my CICD deployementt
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🚀 DevOps Pipeline Demo</h1>
+            <div class="badge">Version 2.0.1</div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Status Cards -->
+            <div class="card-grid">
+                <div class="card">
+                    <h3>📦 Deployment</h3>
+                    <div class="status-item">
+                        <span>Status:</span>
+                        <span class="status-badge success">Active</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Environment:</span>
+                        <span>Kubernetes</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Region:</span>
+                        <span>us-east-1</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>🔄 CI/CD Pipeline</h3>
+                    <div class="status-item">
+                        <span>Last Build:</span>
+                        <span class="success">#42 ✓</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Commit:</span>
+                        <span>7a3d5f9</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Deployed:</span>
+                        <span>2 mins ago</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>⚙️ Auto-scaling</h3>
+                    <div class="status-item">
+                        <span>Current Pods:</span>
+                        <span class="highlight">3</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Min Pods:</span>
+                        <span>2</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Max Pods:</span>
+                        <span>10</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Health -->
+            <div class="health-section">
+                <h2>📊 System Health</h2>
+                <div class="health-grid">
+                    <div class="health-item">
+                        <span>CPU Usage</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 45%"></div>
+                        </div>
+                        <span class="percentage">45%</span>
+                    </div>
+                    <div class="health-item">
+                        <span>Memory Usage</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 62%"></div>
+                        </div>
+                        <span class="percentage">62%</span>
+                    </div>
+                    <div class="health-item">
+                        <span>Network I/O</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 28%"></div>
+                        </div>
+                        <span class="percentage">28%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Controls -->
+            <div class="test-controls">
+                <h3>🧪 Load Testing</h3>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="alert('Load test initiated! Check HPA scaling in K8s')">
+                        Simulate High Load
+                    </button>
+                    <button class="btn btn-secondary" onclick="alert('Load reset. Pods will scale down')">
+                        Reset Load
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>This is a practice site for CI/CD and Kubernetes auto-scaling</p>
+            <p class="commit-info">Latest Commit: Added auto-scaling dashboard | Build #42</p>
+        </footer>
+    </div>
 </body>
+
+</html>
