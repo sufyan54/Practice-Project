@@ -6,26 +6,26 @@ pipeline {
     }
     
     environment {
-        DOCKER_IMAGE = "sufyan12345/myapp:latest"
+        DOCKER_HUB_REPO = "sufyan12345/myapp"
+        // Generate unique tag with build number
+        BUILD_TAG = "build-${BUILD_NUMBER}"
+        DOCKER_IMAGE = "${DOCKER_HUB_REPO}:${BUILD_TAG}"
     }
     
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
-                // Verify CSS exists
-                sh 'ls -la style.css || echo "⚠️ CSS file missing!"'
             }
         }
         
         stage('Build Docker Image') {
             steps {
                 script {
-                    // FORCE rebuild with NO CACHE
-                    sh 'docker build --no-cache -t ${DOCKER_IMAGE} .'
-                    
-                    // Verify CSS is in the image
-                    sh 'docker run --rm ${DOCKER_IMAGE} ls -la /usr/share/nginx/html/style.css'
+                    // Build with unique tag
+                    sh "docker build -t ${DOCKER_IMAGE} ."
+                    // Also tag as latest
+                    sh "docker tag ${DOCKER_IMAGE} ${DOCKER_HUB_REPO}:latest"
                 }
             }
         }
@@ -34,7 +34,8 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('', 'dockerhub-credentials') {
-                        sh 'docker push ${DOCKER_IMAGE}'
+                        sh "docker push ${DOCKER_IMAGE}"
+                        sh "docker push ${DOCKER_HUB_REPO}:latest"
                     }
                 }
             }
@@ -43,31 +44,17 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Force Kubernetes to use new image
-                    sh 'kubectl set image deployment/myapp myapp=${DOCKER_IMAGE} --record'
-                    sh 'kubectl rollout restart deployment myapp'
-                    sh 'kubectl rollout status deployment/myapp --timeout=60s'
+                    // Update deployment with new tag
+                    sh "sed -i 's|image:.*|image: ${DOCKER_IMAGE}|g' k8s-deployment.yaml"
                     
-                    // Show running pods with new image
-                    sh '''
-                        echo "✅ Running pods:"
-                        kubectl get pods
-                        
-                        echo "\\n✅ Checking CSS in new pod:"
-                        POD=$(kubectl get pods -l app=myapp -o jsonpath='{.items[0].metadata.name}')
-                        kubectl exec $POD -- ls -la /usr/share/nginx/html/style.css
-                    '''
+                    // Apply the updated file
+                    sh 'kubectl apply -f k8s-deployment.yaml'
+                    
+                    // Force restart
+                    sh 'kubectl rollout restart deployment myapp'
+                    sh 'kubectl rollout status deployment/myapp'
                 }
             }
-        }
-    }
-    
-    post {
-        success {
-            echo '✅ CI/CD Pipeline completed successfully! CSS deployed!'
-        }
-        failure {
-            echo '❌ CI/CD Pipeline failed!'
         }
     }
 }
