@@ -1,63 +1,71 @@
 pipeline {
     agent any
-    
+
     triggers {
         githubPush()
     }
-    
+
     environment {
-        DOCKER_IMAGE = "sufyan12345/myapp:latest"
+        IMAGE_NAME = "sufyan12345/myapp"
+        IMAGE_TAG  = "${BUILD_NUMBER}"
+        DOCKER_CREDENTIALS = "dockerhub-credentials"
+        K8S_DEPLOYMENT = "myapp"
+        K8S_CONTAINER  = "myapp"
     }
-    
+
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
-        
+
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE}")
+                    echo "🔨 Building Docker Image: ${IMAGE_NAME}:${IMAGE_TAG}"
+                    docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
                 }
             }
         }
-        
+
         stage('Push to DockerHub') {
             steps {
                 script {
-                    docker.withRegistry('', 'dockerhub-credentials') {
-                        docker.image("${DOCKER_IMAGE}").push()
+                    echo "📤 Pushing Image to DockerHub..."
+                    docker.withRegistry('', DOCKER_CREDENTIALS) {
+                        docker.image("${IMAGE_NAME}:${IMAGE_TAG}").push()
                     }
                 }
             }
         }
-        
+
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Use the correct filename
-                    sh 'kubectl apply -f k8s-deployment.yaml'  // Make sure this matches your filename
-                    sh 'kubectl rollout status deployment/myapp'
-                    
-                    // Show deployment status
-                    sh '''
-                        echo "📊 Deployment Status:"
-                        kubectl get pods
-                        kubectl get svc
-                    '''
+                    echo "🚀 Updating Kubernetes Deployment..."
+
+                    sh """
+                        kubectl set image deployment/${K8S_DEPLOYMENT} \
+                        ${K8S_CONTAINER}=${IMAGE_NAME}:${IMAGE_TAG}
+
+                        kubectl rollout status deployment/${K8S_DEPLOYMENT}
+
+                        echo "📊 Current Pods:"
+                        kubectl get pods -o wide
+                    """
                 }
             }
         }
     }
-    
+
     post {
         success {
-            echo '✅ CI/CD Pipeline completed successfully!'
+            echo "✅ CI/CD Pipeline completed successfully!"
         }
         failure {
-            echo '❌ CI/CD Pipeline failed!'
+            echo "❌ CI/CD Pipeline failed!"
         }
     }
 }
